@@ -1,0 +1,5 @@
+.card-cat {
+  display: flex;
+  place-items: center;
+  gap: 1rem;
+}
