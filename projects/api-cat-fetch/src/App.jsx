@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { CardCat } from './components/CardCat'
 import './App.css'
-import { v4 as uuidv4 } from 'uuid'
+import { useGenerateFact } from './hooks/useGenerateFact'
+import { useGenerateCat } from './hooks/useGenerateCat'
 
-const URL_API_FACT = 'https://catfact.ninja/fact'
 function App() {
-  const [phrase, setPhrase] = useState()
   const [counter, setCounter] = useState(0)
   const [qty, setQty] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [wordSearched, setWordSearched] = useState()
   const [messageError, setMessageError] = useState()
-  const [arrCat, setArrCat] = useState([])
-  const [loading, setLoading] = useState(false)
+
+  const { phrase } = useGenerateFact({ counter })
+  const { loading, arrCat, setWordSearched, wordSearched } = useGenerateCat({
+    phrase,
+    qty,
+    submitted
+  })
 
   const handleReset = () => {
     setWordSearched(null)
@@ -31,37 +34,6 @@ function App() {
     }
     setSubmitted(!submitted)
   }
-
-  useEffect(() => {
-    fetch(URL_API_FACT)
-      .then((res) => res.json())
-      .then((data) => {
-        const { fact } = data
-        setPhrase(fact)
-      })
-  }, [counter])
-
-  useEffect(() => {
-    if (!phrase || !qty) return
-    const qtyWords = phrase.split(' ', qty).join(' ')
-    setWordSearched(qtyWords)
-    setLoading(true)
-    fetch(`https://cataas.com/cat/says/${qtyWords}?fontSize=50&fontColor=red`)
-      .then((data) => {
-        const objCat = {
-          id: uuidv4(),
-          text: qtyWords,
-          text_search: phrase,
-          image: data.url
-        }
-        setArrCat([...arrCat, objCat])
-        setLoading(false)
-      })
-      .catch((err) => {
-        setLoading(false)
-        console.log(err)
-      })
-  }, [submitted])
 
   return (
     <>
